@@ -1,4 +1,4 @@
-# Wątki
+# Ariadne
 
 Navigate the Guardian’s threads
 
