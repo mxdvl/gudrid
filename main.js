@@ -9,27 +9,30 @@ const key = document.querySelector("input");
 if (!key) throw Error("no key input");
 
 /**
- * @param {string} tag
- * @param {Date} date
- * @param {'past' | 'future'} direction
+ * @param {object} options
+ * @param {string} options.tag
+ * @param {Date} options.date
+ * @param {'past' | 'future'} options.direction
+ * @param {string} options.key
  */
-async function* follow(tag, date, direction) {
-  const options = direction === "past"
+async function* follow({ tag, date, direction, key }) {
+  const dates = direction === "past"
     ? {
-      "order-by": "newest",
+      "from-date": "1000-01-01",
       "to-date": date.toISOString().slice(0, 10),
     }
     : {
-      "order-by": "oldest",
       "from-date": date.toISOString().slice(0, 10),
+      "to-date": "3000-12-31",
     };
 
   const params = new URLSearchParams({
     tag,
-    ...options,
+    "order-by": direction === "past" ? "newest" : "oldest",
+    ...dates,
     "page-size": String(12),
     "show-elements": ["image", "cartoon"].join(","), // maybe `all`
-    "api-key": key.value,
+    "api-key": key,
   });
 
   const url = new URL(`/search?${params.toString()}`, base);
@@ -38,7 +41,9 @@ async function* follow(tag, date, direction) {
     .then((response) => response.json())
     .then((json) => capi(json));
 
+  /** @type {(result: typeof response.results[number])=> boolean} */
   const isBefore = ({ webPublicationDate }) => webPublicationDate < date;
+  /** @type {(result: typeof response.results[number])=> boolean} */
   const isAfter = ({ webPublicationDate }) => webPublicationDate > date;
 
   let count = 0;
@@ -96,7 +101,14 @@ document.addEventListener("click", async (event) => {
   console.log("About to fetch:", text);
 
   event.target.appendChild(ul);
-  for await (const article of follow(text, new Date(), "past")) {
+  for await (
+    const article of follow({
+      tag: text,
+      date: new Date(),
+      direction: "past",
+      key: key.value,
+    })
+  ) {
     await delay(600);
 
     if (!article.elements) continue;
@@ -117,6 +129,14 @@ document.addEventListener("click", async (event) => {
     }
   }
 });
+
+/**
+ * @param {Date} date
+ * @param {string} title
+ * @returns
+ */
+const format = (date, title) =>
+  `<time>${date.toISOString().slice(0, 10)}</time> ${title}`;
 
 document.addEventListener("click", async (event) => {
   if (!(event.target instanceof HTMLLIElement)) return;
@@ -146,35 +166,43 @@ document.addEventListener("click", async (event) => {
 
   const li = document.createElement("li");
   li.classList.add("current");
-  li.innerText =
-    `${response.content.webTitle} - ${response.content.webPublicationDate.toISOString()}`;
+  li.innerHTML = format(
+    response.content.webPublicationDate,
+    response.content.webTitle,
+  );
   ul.appendChild(li);
 
   for await (
-    const article of follow(
-      tag.id,
-      response.content.webPublicationDate,
-      "future",
-    )
+    const article of follow({
+      tag: tag.id,
+      date: response.content.webPublicationDate,
+      direction: "future",
+      key: key.value,
+    })
   ) {
     const li = document.createElement("li");
-    li.innerText = `${
-      article.webPublicationDate.toISOString().slice(0, 10)
-    } – ${article.webTitle}`;
+    li.innerHTML = format(
+      article.webPublicationDate,
+      article.webTitle,
+    );
     ul.prepend(li);
   }
 
   for await (
     const article of follow(
-      tag.id,
-      response.content.webPublicationDate,
-      "past",
+      {
+        tag: tag.id,
+        date: response.content.webPublicationDate,
+        direction: "past",
+        key: key.value,
+      },
     )
   ) {
     const li = document.createElement("li");
-    li.innerText = `${
-      article.webPublicationDate.toISOString().slice(0, 10)
-    } – ${article.webTitle}`;
+    li.innerHTML = format(
+      article.webPublicationDate,
+      article.webTitle,
+    );
     ul.appendChild(li);
   }
 });
