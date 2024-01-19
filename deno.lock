@@ -1,0 +1,7 @@
+{
+  "version": "3",
+  "redirects": {
+    "https://esm.sh/valibot": "https://esm.sh/valibot@0.26.0"
+  },
+  "remote": {}
+}

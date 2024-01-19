@@ -1,8 +1,7 @@
 {
   "tasks": {
     "dev": "./scripts/dev.sh",
-    "build": "./scripts/build.js",
-    "format": "deno fmt & ./scripts/format.js"
+    "format": "deno fmt"
   },
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "deno.ns"]
