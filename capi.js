@@ -32,12 +32,21 @@ const element = object({
   })),
 });
 
+const tag = object({
+  id: string(),
+  type: string(),
+  // sectionId: string(),
+  webTitle: string(),
+  description: string(),
+});
+
 const result = object({
   pillarId,
   id: string(),
   type: string(), // ["tag", "article", "picture", "liveblog"]
   webPublicationDate: coerce(date(), (input) => new Date(input)),
   webTitle: string(),
+  tags: optional(array(tag)),
   webUrl: transform(string([url()]), (input) => new URL(input)),
   elements: optional(array(element)),
 });
@@ -48,8 +57,16 @@ const schema = object({
     currentPage: number(),
     pages: number(),
     pageSize: number(),
-    results: array(result),
     total: number(),
+    results: array(result),
+  }),
+});
+
+const content_schema = object({
+  response: object({
+    status: literal("ok"),
+    total: literal(1),
+    content: result,
   }),
 });
 
@@ -57,3 +74,8 @@ const schema = object({
  * @param {unknown} response
  */
 export const capi = (response) => parse(schema, response);
+
+/**
+ * @param {unknown} response
+ */
+export const content = (response) => parse(content_schema, response);

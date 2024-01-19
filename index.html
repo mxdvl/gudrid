@@ -3,27 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wątki – Navigate the Guardian’s threads</title>
+    <title>Ariadne – Navigate the Guardian’s threads</title>
 
     <style>
       body {
         display: grid;
         font-family: system-ui, sans-serif;
       }
+
+      .current {
+        opacity: 0.6;
+        color: darkblue;
+      }
     </style>
 
     <script type="module" src="/main.js"></script>
   </head>
   <body>
-    <header>Wątki</header>
+    <header>Ariadne</header>
 
     <main>
+      <label
+        >API key: <input type="text" id="key" value="test" />
+        <a href="https://bonobo.capi.gutools.co.uk/">(get one)</a>
+      </label>
+
       <p>Pick a subject:</p>
 
       <ul>
-        <li>food/food</li>
-        <li>books/series/tom-gauld-s-cultural-cartoons</li>
-        <li>tone/minutebyminute</li>
+        <li data-info="tag">food/food</li>
+        <li data-info="tag">books/series/tom-gauld-s-cultural-cartoons</li>
+        <li data-info="tag">tone/minutebyminute</li>
+        <li data-info="tag">lifeandstyle/series/the-stephen-collins-cartoon</li>
+      </ul>
+
+      <ul>
+        <li data-info="content">
+          /news/gallery/2024/jan/17/snowy-mountains-and-a-bonfire-festival-photos-of-the-day-wednesday
+        </li>
+        <li data-info="content">
+          /fashion/2015/oct/17/unisex-perfume-sali-hughes-beauty
+        </li>
       </ul>
     </main>
 
