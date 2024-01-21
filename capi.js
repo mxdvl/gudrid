@@ -1,7 +1,5 @@
 import {
   array,
-  coerce,
-  date,
   literal,
   number,
   object,
@@ -44,14 +42,14 @@ const result = object({
   pillarId,
   id: string(),
   type: string(), // ["tag", "article", "picture", "liveblog"]
-  webPublicationDate: coerce(date(), (input) => new Date(input)),
+  webPublicationDate: transform(string(), (input) => new Date(input)),
   webTitle: string(),
   tags: optional(array(tag)),
   webUrl: transform(string([url()]), (input) => new URL(input)),
   elements: optional(array(element)),
 });
 
-const schema = object({
+const search_schema = object({
   response: object({
     status: literal("ok"),
     currentPage: number(),
@@ -70,12 +68,18 @@ const content_schema = object({
   }),
 });
 
+/** @typedef {ReturnType<typeof search>} Search */
 /**
  * @param {unknown} response
  */
-export const capi = (response) => parse(schema, response);
+const search = (response) => parse(search_schema, response);
 
+/** @typedef {ReturnType<typeof content>} Content */
 /**
  * @param {unknown} response
  */
-export const content = (response) => parse(content_schema, response);
+const content = (response) => parse(content_schema, response);
+
+const base = "https://content.guardianapis.com/";
+
+export { base, content, search };

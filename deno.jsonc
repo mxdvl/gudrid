@@ -4,6 +4,7 @@
     "format": "deno fmt"
   },
   "compilerOptions": {
+    "checkJs": true,
     "lib": ["dom", "dom.iterable", "deno.ns"]
   }
 }
