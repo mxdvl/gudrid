@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ariadne – Navigate the Guardian’s threads</title>
+
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        color-scheme: dark;
+        display: grid;
+        font-family: system-ui, sans-serif;
+        background-color: Canvas;
+        color: Text;
+      }
+
+      ul {
+        width: 100vw;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        height: 90vh;
+        grid-template-columns: repeat(3, 100vw);
+        /* gap: 4vw; */
+        list-style-type: none;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+      }
+
+      li {
+        scroll-snap-align: center;
+      }
+
+      li img {
+        display: block;
+        margin: auto;
+        max-width: 90%;
+        object-fit: contain;
+      }
+    </style>
+
+    <script type="module" src="./lightbox.js"></script>
+  </head>
+  <body>
+    <header>Ariadne</header>
+
+    <main>
+      <label
+        >API key: <input type="text" id="key" value="test" />
+        <a href="https://bonobo.capi.gutools.co.uk/">(get one)</a>
+      </label>
+
+      <ul>
+        <li id="previous">
+          <img
+            src="https://placehold.co/1500x900?text=Previous"
+            alt="Previous"
+          />
+        </li>
+        <li id="current">
+          <img src="https://placehold.co/1500x900?text=Current" alt="Current" />
+        </li>
+        <li id="next">
+          <img src="https://placehold.co/1500x900?text=Next" alt="Next" />
+        </li>
+      </ul>
+    </main>
+
+    <footer></footer>
+  </body>
+</html>

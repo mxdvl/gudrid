@@ -1,9 +1,6 @@
 import { base, content } from "./capi.js";
+import { key } from "./key.js";
 import { follow } from "./threads.js";
-
-const key = document.querySelector("input");
-
-if (!key) throw Error("no key input");
 
 /** @param {number} time @returns {Promise<void>} */
 const delay = (time = 120) =>
@@ -24,20 +21,6 @@ const resized = (master) => {
   console.log(path);
   return new URL(`${path}?${params.toString()}`, "https://i.guim.co.uk").href;
 };
-
-document.addEventListener("DOMContentLoaded", () => {
-  const value = localStorage.getItem("key");
-  if (value !== null && value.length > 0) {
-    key.value = value;
-  }
-});
-
-key.addEventListener("input", (e) => {
-  if (!(e instanceof InputEvent)) return;
-  if (!(e.target instanceof HTMLInputElement)) return;
-  const { value } = e.target;
-  localStorage.setItem("key", value);
-});
 
 document.addEventListener("click", async (event) => {
   if (!(event.target instanceof HTMLLIElement)) return;
