@@ -1,10 +1,7 @@
 import { key } from "./key.js";
 
 /** Setup **/
-
 key;
-document.querySelector("#current")?.scrollIntoView();
-
 const ul = document.querySelector("ul");
 
 if (!ul) throw ("No lightbox");
@@ -20,15 +17,17 @@ ul.addEventListener("scroll", () => {
   timer = setTimeout(() => {
     document.dispatchEvent(event);
     clearTimeout(timer);
-  }, 36);
+  }, 60);
 });
 
 /** @param {number} index */
 const image = (index) => `https://placehold.co/1500x900?text=${index}`;
 
-let index = 600;
+let index = 24;
 
 const [first, middle, last] = [...ul.querySelectorAll("li")];
+
+middle.scrollIntoView();
 
 const past = () => {
   index--;
@@ -37,6 +36,7 @@ const past = () => {
   last.replaceChildren(...middle.childNodes);
   middle.replaceChildren(...first.childNodes);
   first.replaceChildren(img);
+  middle.scrollIntoView();
 };
 
 const future = () => {
@@ -46,27 +46,19 @@ const future = () => {
   first.replaceChildren(...middle.childNodes);
   middle.replaceChildren(...last.childNodes);
   last.replaceChildren(img);
+  middle.scrollIntoView();
 };
 
 document.addEventListener(event.type, () => {
   const width = ul.clientWidth;
   const position = Math.round(2 * (ul.scrollLeft + width / 2) / ul.scrollWidth);
   switch (position) {
-    case 0: {
-      return requestAnimationFrame(() => {
-        past();
-        ul.scrollBy({ left: +width });
-      });
-    }
-    case 1: {
+    case 0:
+      return requestAnimationFrame(past);
+    case 1:
       return;
-    }
-    case 2: {
-      return requestAnimationFrame(() => {
-        future();
-        ul.scrollBy({ left: -width });
-      });
-    }
+    case 2:
+      return requestAnimationFrame(future);
   }
 });
 
