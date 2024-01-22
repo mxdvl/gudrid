@@ -25,6 +25,24 @@ let index = 600;
 
 const [first, middle, last] = [...ul.querySelectorAll("li")];
 
+const past = () => {
+  index--;
+  const img = document.createElement("img");
+  img.src = image(index - 1);
+  last.replaceChildren(...middle.childNodes);
+  middle.replaceChildren(...first.childNodes);
+  first.replaceChildren(img);
+};
+
+const future = () => {
+  index++;
+  const img = document.createElement("img");
+  img.src = image(index + 1);
+  first.replaceChildren(...middle.childNodes);
+  middle.replaceChildren(...last.childNodes);
+  last.replaceChildren(img);
+};
+
 document.addEventListener(event.type, () => {
   const width = ul.clientWidth;
   const position = Math.round(2 * (ul.scrollLeft + width / 2) / ul.scrollWidth);
@@ -36,33 +54,30 @@ document.addEventListener(event.type, () => {
   });
   switch (position) {
     case 0: {
-      requestAnimationFrame(() => {
-        index--;
-        const img = document.createElement("img");
-        img.src = image(index - 1);
-        last.replaceChildren(...middle.childNodes);
-        middle.replaceChildren(...first.childNodes);
-        first.replaceChildren(img);
+      return requestAnimationFrame(() => {
+        past();
         ul.scrollBy({ left: +width });
       });
-      return;
     }
     case 1: {
-      console.log("nothing");
-      return;
+      return console.log("nothing");
     }
     case 2: {
-      requestAnimationFrame(() => {
-        index++;
-        const img = document.createElement("img");
-        img.src = image(index + 1);
-        first.replaceChildren(...middle.childNodes);
-        middle.replaceChildren(...last.childNodes);
-        last.replaceChildren(img);
+      return requestAnimationFrame(() => {
+        future();
         ul.scrollBy({ left: -width });
       });
-      return;
     }
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  console.log(event);
+  switch (event.key) {
+    case "ArrowLeft":
+      return requestAnimationFrame(past);
+    case "ArrowRight":
+      return requestAnimationFrame(future);
   }
 });
 
