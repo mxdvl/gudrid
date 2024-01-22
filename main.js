@@ -1,6 +1,6 @@
 import { base, content } from "./capi.js";
 import { key } from "./key.js";
-import { future, past } from "./threads.js";
+import { follow } from "./threads.js";
 
 /** @param {number} time @returns {Promise<void>} */
 const delay = (time = 120) =>
@@ -32,7 +32,8 @@ document.addEventListener("click", async (event) => {
 
   event.target.appendChild(ul);
   for await (
-    const article of past({
+    const article of follow({
+      direction: "past",
       tag: text,
       date: new Date(),
       key: key.value,
@@ -102,7 +103,8 @@ document.addEventListener("click", async (event) => {
   ul.appendChild(li);
 
   for await (
-    const article of future({
+    const article of follow({
+      direction: "future",
       tag: tag.id,
       date: response.content.webPublicationDate,
       key: key.value,
@@ -118,8 +120,9 @@ document.addEventListener("click", async (event) => {
   }
 
   for await (
-    const article of past(
+    const article of follow(
       {
+        direction: "past",
         tag: tag.id,
         date: response.content.webPublicationDate,
         key: key.value,
