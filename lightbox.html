@@ -13,14 +13,14 @@
         display: grid;
         font-family: system-ui, sans-serif;
         background-color: Canvas;
-        color: Text;
+        color: CanvasText;
       }
 
-      header,
-      nav {
+      header {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 1rem;
       }
 
       ul {
@@ -67,14 +67,13 @@
         >API key: <input type="text" id="key" value="test" />
         <a href="https://bonobo.capi.gutools.co.uk/">(get one)</a>
       </label>
-    </header>
-
-    <main>
       <nav>
         <button type="button" class="previous">&larr;</button>
         <button type="button" class="next">&rarr;</button>
       </nav>
+    </header>
 
+    <main>
       <ul>
         <li id="previous">
           <img src="https://placehold.co/1500x900?text=23" alt="Previous" />
