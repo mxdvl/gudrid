@@ -16,6 +16,13 @@
         color: Text;
       }
 
+      header,
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
       ul {
         width: 100vw;
         padding: 0;
@@ -45,18 +52,28 @@
         max-width: 90%;
         object-fit: contain;
       }
+
+      button:disabled {
+        opacity: 0;
+      }
     </style>
 
     <script type="module" src="./lightbox.js"></script>
   </head>
   <body>
-    <header>Ariadne</header>
-
-    <main>
+    <header>
+      <h1>Ariadne</h1>
       <label
         >API key: <input type="text" id="key" value="test" />
         <a href="https://bonobo.capi.gutools.co.uk/">(get one)</a>
       </label>
+    </header>
+
+    <main>
+      <nav>
+        <button type="button" class="previous">&larr;</button>
+        <button type="button" class="next">&rarr;</button>
+      </nav>
 
       <ul>
         <li id="previous">
