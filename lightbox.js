@@ -15,21 +15,52 @@ ul.addEventListener("scroll", () => {
   timer = setTimeout(() => {
     document.dispatchEvent(event);
     clearTimeout(timer);
-  }, 60);
+  }, 36);
 });
 
+/** @param {number} index */
+const image = (index) => `https://placehold.co/1500x900?text=${index}`;
+
+let index = 600;
+
+const [first, middle, last] = [...ul.querySelectorAll("li")];
+
 document.addEventListener(event.type, () => {
-  const position = ul.scrollLeft / ul.clientWidth;
-  console.log("finished scrolling", ul.scrollLeft, position);
+  const width = ul.clientWidth;
+  const position = Math.round(2 * (ul.scrollLeft + width / 2) / ul.scrollWidth);
+  console.log("finished scrolling", {
+    left: ul.scrollLeft,
+    position,
+    width,
+    scroll: ul.scrollWidth,
+  });
   switch (position) {
-    case 2:
     case 0: {
-      ul.scrollTo(2 * ul.clientWidth / 3, 0);
+      requestAnimationFrame(() => {
+        index--;
+        const img = document.createElement("img");
+        img.src = image(index - 1);
+        last.replaceChildren(...middle.childNodes);
+        middle.replaceChildren(...first.childNodes);
+        first.replaceChildren(img);
+        ul.scrollBy({ left: +width });
+      });
       return;
     }
-
     case 1: {
       console.log("nothing");
+      return;
+    }
+    case 2: {
+      requestAnimationFrame(() => {
+        index++;
+        const img = document.createElement("img");
+        img.src = image(index + 1);
+        first.replaceChildren(...middle.childNodes);
+        middle.replaceChildren(...last.childNodes);
+        last.replaceChildren(img);
+        ul.scrollBy({ left: -width });
+      });
       return;
     }
   }
