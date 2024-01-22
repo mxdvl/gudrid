@@ -1,10 +1,15 @@
 import { key } from "./key.js";
 
+/** Setup **/
+
+key;
 document.querySelector("#current")?.scrollIntoView();
 
 const ul = document.querySelector("ul");
 
 if (!ul) throw ("No lightbox");
+
+/** Events **/
 
 const event = new Event("lightbox:scrolled");
 
@@ -46,12 +51,6 @@ const future = () => {
 document.addEventListener(event.type, () => {
   const width = ul.clientWidth;
   const position = Math.round(2 * (ul.scrollLeft + width / 2) / ul.scrollWidth);
-  console.log("finished scrolling", {
-    left: ul.scrollLeft,
-    position,
-    width,
-    scroll: ul.scrollWidth,
-  });
   switch (position) {
     case 0: {
       return requestAnimationFrame(() => {
@@ -60,7 +59,7 @@ document.addEventListener(event.type, () => {
       });
     }
     case 1: {
-      return console.log("nothing");
+      return;
     }
     case 2: {
       return requestAnimationFrame(() => {
@@ -72,7 +71,6 @@ document.addEventListener(event.type, () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  console.log(event);
   switch (event.key) {
     case "ArrowLeft":
       return requestAnimationFrame(past);
@@ -80,7 +78,3 @@ document.addEventListener("keydown", (event) => {
       return requestAnimationFrame(future);
   }
 });
-
-// setInterval(() => {
-//   console.log(scrolling);
-// }, 12);
