@@ -31,9 +31,13 @@ ul.addEventListener("scroll", () => {
 
 const min = 0;
 let index = 0;
-const images = [
-  "https://media.guim.co.uk/00dc6fb9bf3c5482e6c41f11a6ea711c3d996406/0_0_5568_3712/master/5568.jpg",
-];
+const images = [{
+  src:
+    "https://media.guim.co.uk/00dc6fb9bf3c5482e6c41f11a6ea711c3d996406/0_0_5568_3712/master/5568.jpg",
+  title: "Eyewitness: Seoul",
+  href:
+    "https://www.theguardian.com/world/picture/2016/nov/20/eyewitness-seoul",
+}];
 
 const [first, middle, last] = [...ul.querySelectorAll("li")];
 
@@ -58,7 +62,13 @@ const prepend = async () => {
   const next = await before.next();
   if (next.done) return;
   const extra_images = get_images(next.value.elements ?? []);
-  images.unshift(...extra_images);
+  images.unshift(
+    ...extra_images.map((src) => ({
+      src,
+      href: next.value.webUrl.href,
+      title: next.value.webTitle,
+    })),
+  );
   index += extra_images.length;
 };
 const past = async () => {
@@ -72,11 +82,16 @@ const past = async () => {
     middle.scrollIntoView();
     return;
   }
-  const img = document.createElement("img");
-  img.src = resized(images[index - 1]);
   last.replaceChildren(...middle.childNodes);
   middle.replaceChildren(...first.childNodes);
-  first.replaceChildren(img);
+
+  const image = images[index - 1];
+  const img = document.createElement("img");
+  img.src = resized(image.src);
+  const a = document.createElement("a");
+  a.href = image.href;
+  a.innerText = image.title;
+  first.replaceChildren(img, a);
   middle.scrollIntoView();
 };
 
@@ -85,7 +100,13 @@ const append = async () => {
   const next = await after.next();
   if (next.done) return;
   const extra_images = get_images(next.value.elements ?? []);
-  images.push(...extra_images);
+  images.push(
+    ...extra_images.map((src) => ({
+      src,
+      href: next.value.webUrl.href,
+      title: next.value.webTitle,
+    })),
+  );
 };
 const future = async () => {
   await append();
@@ -98,11 +119,16 @@ const future = async () => {
     middle.scrollIntoView();
     return;
   }
-  const img = document.createElement("img");
-  img.src = resized(images[index + 1]);
   first.replaceChildren(...middle.childNodes);
   middle.replaceChildren(...last.childNodes);
-  last.replaceChildren(img);
+
+  const image = images[index + 1];
+  const img = document.createElement("img");
+  img.src = resized(image.src);
+  const a = document.createElement("a");
+  a.href = image.href;
+  a.innerText = image.title;
+  last.replaceChildren(img, a);
   middle.scrollIntoView();
 };
 
@@ -113,13 +139,19 @@ const setup = async () => {
   const last_image = images[index + 1];
   if (first_image) {
     const img = document.createElement("img");
-    img.src = resized(first_image);
-    first.replaceChildren(img);
+    img.src = resized(first_image.src);
+    const a = document.createElement("a");
+    a.href = first_image.href;
+    a.innerText = first_image.title;
+    first.replaceChildren(img, a);
   }
   if (last_image) {
     const img = document.createElement("img");
-    img.src = resized(last_image);
-    last.replaceChildren(img);
+    img.src = resized(last_image.src);
+    const a = document.createElement("a");
+    a.href = first_image.href;
+    a.innerText = first_image.title;
+    last.replaceChildren(img, a);
   }
 };
 
