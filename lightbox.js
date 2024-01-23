@@ -1,6 +1,6 @@
 import { follow } from "./threads.js";
 import { key } from "./key.js";
-import { resized } from "./images.js";
+import { resized, width } from "./images.js";
 
 /** Setup **/
 key;
@@ -13,7 +13,8 @@ if (!ul || !previous || !next) throw ("No lightbox");
 
 // const id = "/world/picture/2016/nov/20/eyewitness-seoul";
 const date = new Date(1479658237000);
-const tag = "world/series/eyewitness";
+const tag = new URLSearchParams(window.location.search).get("tag") ??
+  "world/series/eyewitness";
 
 /** Events **/
 
@@ -88,6 +89,7 @@ const past = async () => {
   const image = images[index - 1];
   const img = document.createElement("img");
   img.src = resized(image.src);
+  img.width = width;
   const a = document.createElement("a");
   a.href = image.href;
   a.innerText = image.title;
@@ -125,6 +127,7 @@ const future = async () => {
   const image = images[index + 1];
   const img = document.createElement("img");
   img.src = resized(image.src);
+  img.width = width;
   const a = document.createElement("a");
   a.href = image.href;
   a.innerText = image.title;
@@ -140,6 +143,7 @@ const setup = async () => {
   if (first_image) {
     const img = document.createElement("img");
     img.src = resized(first_image.src);
+    img.width = width;
     const a = document.createElement("a");
     a.href = first_image.href;
     a.innerText = first_image.title;
@@ -148,6 +152,7 @@ const setup = async () => {
   if (last_image) {
     const img = document.createElement("img");
     img.src = resized(last_image.src);
+    img.width = width;
     const a = document.createElement("a");
     a.href = first_image.href;
     a.innerText = first_image.title;
@@ -187,3 +192,15 @@ document.addEventListener("keydown", (event) => {
       return requestAnimationFrame(future);
   }
 });
+
+const input = document.querySelector("input#tag");
+if (!(input instanceof HTMLInputElement)) throw Error("No tag input");
+
+input.addEventListener("input", (event) => {
+  if (!(event.target instanceof HTMLInputElement)) return;
+
+  window.location.search = new URLSearchParams({ tag: event.target.value.trim() })
+    .toString();
+});
+
+input.value = tag;

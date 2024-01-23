@@ -1,3 +1,5 @@
+const width = 1200;
+
 /** @param {string} master */
 const resized = (master) => {
   const url = new URL(master);
@@ -5,11 +7,11 @@ const resized = (master) => {
   const path = ["img", bucket, url.pathname.replace(/^\//, "")].join("/");
   const params = new URLSearchParams({
     dpr: String(2),
-    width: String(480),
+    width: String(width),
     s: "none",
   });
   console.log(path);
   return new URL(`${path}?${params.toString()}`, "https://i.guim.co.uk").href;
 };
 
-export { resized };
+export { resized, width };
