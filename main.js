@@ -1,4 +1,5 @@
 import { base, content } from "./capi.js";
+import { resized } from "./images.js";
 import { key } from "./key.js";
 import { follow } from "./threads.js";
 
@@ -7,20 +8,6 @@ const delay = (time = 120) =>
   new Promise((resolve) => {
     setTimeout(resolve, time);
   });
-
-/** @param {string} master */
-const resized = (master) => {
-  const url = new URL(master);
-  const [bucket] = url.hostname.split(".");
-  const path = ["img", bucket, url.pathname.replace(/^\//, "")].join("/");
-  const params = new URLSearchParams({
-    dpr: String(2),
-    width: String(480),
-    s: "none",
-  });
-  console.log(path);
-  return new URL(`${path}?${params.toString()}`, "https://i.guim.co.uk").href;
-};
 
 document.addEventListener("click", async (event) => {
   if (!(event.target instanceof HTMLLIElement)) return;

@@ -1,4 +1,6 @@
+import { follow } from "./threads.js";
 import { key } from "./key.js";
+import { resized } from "./images.js";
 
 /** Setup **/
 key;
@@ -8,6 +10,10 @@ const [previous, next] = document
   ?.querySelectorAll("button") ?? [];
 
 if (!ul || !previous || !next) throw ("No lightbox");
+
+const id = "/world/picture/2016/nov/20/eyewitness-seoul";
+const date = new Date(1479658237000);
+const tag = "world/series/eyewitness";
 
 /** Events **/
 
@@ -23,44 +29,69 @@ ul.addEventListener("scroll", () => {
   }, 60);
 });
 
-/** @param {number} index */
-const image = (index) => `https://placehold.co/1500x900?text=${index}`;
-
-const min = 1;
-const max = 30;
-let index = 24;
+const min = 0;
+let index = 0;
+const images = [
+  "https://media.guim.co.uk/00dc6fb9bf3c5482e6c41f11a6ea711c3d996406/0_0_5568_3712/master/5568.jpg",
+];
 
 const [first, middle, last] = [...ul.querySelectorAll("li")];
 
 middle.scrollIntoView();
 
 const toggleButtons = () => {
+  console.log({ min, index, length: images.length });
   previous.disabled = index <= min;
-  next.disabled = index >= max;
+  next.disabled = index >= images.length - 1;
 };
 
-const past = () => {
+/** @param {NonNullable<import("./capi.js").Search["response"]["results"][number]["elements"]>} elements */
+const get_images = (elements) =>
+  elements.filter(({ relation }) => relation !== "thumbnail")
+    .flatMap(({ assets }) => {
+      const asset = assets.find((asset) => asset.file.includes("/master/"));
+      return asset ? [asset.file] : [];
+    });
+
+const before = follow({ tag, date, key: key.value, direction: "past" });
+const prepend = async () => {
+  const next = await before.next();
+  if (next.done) return;
+  const extra_images = get_images(next.value.elements ?? []);
+  images.unshift(...extra_images);
+  index += extra_images.length;
+};
+const past = async () => {
+  await prepend();
   index = Math.max(index - 1, min);
   toggleButtons();
   if (index <= min) {
     first.scrollIntoView();
     return;
-  } else if (index + 1 === max) {
+  } else if (index + 1 === images.length - 1) {
     middle.scrollIntoView();
     return;
   }
   const img = document.createElement("img");
-  img.src = image(index - 1);
+  img.src = resized(images[index - 1]);
   last.replaceChildren(...middle.childNodes);
   middle.replaceChildren(...first.childNodes);
   first.replaceChildren(img);
   middle.scrollIntoView();
 };
 
-const future = () => {
-  index = Math.min(index + 1, max);
+const after = follow({ tag, date, key: key.value, direction: "future" });
+const append = async () => {
+  const next = await after.next();
+  if (next.done) return;
+  const extra_images = get_images(next.value.elements ?? []);
+  images.push(...extra_images);
+};
+const future = async () => {
+  await append();
+  index = Math.min(index + 1, images.length - 1);
   toggleButtons();
-  if (index >= max) {
+  if (index >= images.length - 1) {
     last.scrollIntoView();
     return;
   } else if (index - 1 === min) {
@@ -68,12 +99,31 @@ const future = () => {
     return;
   }
   const img = document.createElement("img");
-  img.src = image(index + 1);
+  img.src = resized(images[index + 1]);
   first.replaceChildren(...middle.childNodes);
   middle.replaceChildren(...last.childNodes);
   last.replaceChildren(img);
   middle.scrollIntoView();
 };
+
+const setup = async () => {
+  await Promise.all([append(), prepend()]);
+
+  const first_image = images[index - 1];
+  const last_image = images[index + 1];
+  if (first_image) {
+    const img = document.createElement("img");
+    img.src = resized(first_image);
+    first.replaceChildren(img);
+  }
+  if (last_image) {
+    const img = document.createElement("img");
+    img.src = resized(last_image);
+    last.replaceChildren(img);
+  }
+};
+
+await setup();
 
 document.addEventListener("click", (event) => {
   switch (event.target) {
