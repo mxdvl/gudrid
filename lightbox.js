@@ -11,7 +11,7 @@ const [previous, next] = document
 
 if (!ul || !previous || !next) throw ("No lightbox");
 
-const id = "/world/picture/2016/nov/20/eyewitness-seoul";
+// const id = "/world/picture/2016/nov/20/eyewitness-seoul";
 const date = new Date(1479658237000);
 const tag = "world/series/eyewitness";
 
