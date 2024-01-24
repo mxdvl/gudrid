@@ -42,7 +42,7 @@ const create_li = (image) => {
   const img = document.createElement("img");
   img.src = resized(image.src);
   img.width = width;
-  img.loading = "lazy";
+  img.loading = "lazy"; 
   const a = document.createElement("a");
   a.href = image.url.href;
   a.innerText = image.title;
