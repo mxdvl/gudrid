@@ -2,6 +2,7 @@ import { follow } from "./threads.js";
 import { key } from "./key.js";
 import { get_images, resized, width } from "./images.js";
 import { base, content } from "./capi.js";
+import { default_content } from "./fallbacks.js";
 
 /** Setup **/
 key;
@@ -25,7 +26,8 @@ const params = new URLSearchParams({
 const url = new URL(`${article}?${params.toString()}`, base);
 const { response } = await fetch(url, { "mode": "cors" })
   .then((response) => response.json())
-  .then((json) => content(json));
+  .then((json) => content(json))
+  .catch(() => default_content);
 
 const date = response.content.webPublicationDate;
 const tag = response.content.tags.find(({ type }) => type === "series")?.id ??
@@ -36,13 +38,14 @@ const tag = response.content.tags.find(({ type }) => type === "series")?.id ??
  * @param {string} image.src
  * @param {URL} image.url
  * @param {string} image.title
+ * @param {HTMLImageElement["loading"]} [image.loading]
  */
 const create_li = (image) => {
   const li = document.createElement("li");
   const img = document.createElement("img");
   img.src = resized(image.src);
   img.width = width;
-  img.loading = "lazy"; 
+  img.loading = image.loading ?? "lazy";
   const a = document.createElement("a");
   a.href = image.url.href;
   a.innerText = image.title;
@@ -55,6 +58,7 @@ const lis = get_images(response.content.elements).map((src) =>
     src,
     url: response.content.webUrl,
     title: response.content.webTitle,
+    loading: "eager",
   })
 );
 let [current] = lis;
@@ -75,8 +79,14 @@ lightbox.addEventListener("scroll", () => {
 });
 
 const toggleButtons = () => {
-  previous.disabled = !current?.previousSibling;
-  next.disabled = !current?.nextElementSibling;
+  if (!current) return;
+  const { previousElementSibling, nextElementSibling } = current;
+  previous.disabled = !previousElementSibling;
+  next.disabled = !nextElementSibling;
+  [previousElementSibling, nextElementSibling].flatMap((li) => {
+    const img = li?.querySelector("img");
+    return img instanceof HTMLImageElement ? [img] : [];
+  }).map((img) => img.loading = "eager");
 };
 
 const before = follow({ tag, date, key: key.value, direction: "past" });
@@ -131,12 +141,19 @@ document.addEventListener("click", (event) => {
   }
 });
 
+document.addEventListener("resize", () => {
+  current?.scrollIntoView();
+});
+
 document.addEventListener(event.type, () => {
   const lis = lightbox.querySelectorAll("li");
   const position = Math.round(
     lis.length * lightbox.scrollLeft / lightbox.scrollWidth,
   );
+
+  current?.classList.remove("current");
   current = lis[position];
+  current?.classList.add("current");
 
   const left = position;
   const right = lis.length - 1 - position;
@@ -146,6 +163,7 @@ document.addEventListener(event.type, () => {
 });
 
 document.addEventListener("keydown", (event) => {
+  if (event.target instanceof HTMLInputElement) return;
   switch (event.key) {
     case "ArrowLeft":
       return requestAnimationFrame(past);
@@ -156,7 +174,7 @@ document.addEventListener("keydown", (event) => {
 
 const input = document.querySelector("input#article");
 if (!(input instanceof HTMLInputElement)) throw Error("No article input");
-input.value = tag;
+input.value = article;
 
 document.querySelector("header")?.addEventListener("input", (event) => {
   if (!(event.target instanceof HTMLInputElement)) return;

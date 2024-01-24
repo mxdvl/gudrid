@@ -7,8 +7,20 @@
 
     <style>
       body {
+        padding: 0;
+        margin: 0;
+        color-scheme: dark;
         display: grid;
         font-family: system-ui, sans-serif;
+        background-color: Canvas;
+        color: CanvasText;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
       }
 
       .current {
@@ -20,33 +32,37 @@
         font-family: monospace;
       }
     </style>
-
-    <script type="module" src="./main.js"></script>
   </head>
   <body>
-    <header>Ariadne</header>
+    <header>
+      <h1><a href="./">Ariadne</a></h1>
+    </header>
 
     <main>
-      <label
-        >API key: <input type="text" id="key" value="test" />
-        <a href="https://bonobo.capi.gutools.co.uk/">(get one)</a>
-      </label>
-
-      <p>Pick a subject:</p>
+      <p>Pick an article:</p>
 
       <ul>
-        <li data-info="tag">food/food</li>
-        <li data-info="tag">books/series/tom-gauld-s-cultural-cartoons</li>
-        <li data-info="tag">tone/minutebyminute</li>
-        <li data-info="tag">lifeandstyle/series/the-stephen-collins-cartoon</li>
-      </ul>
-
-      <ul>
-        <li data-info="content">
-          /news/gallery/2024/jan/17/snowy-mountains-and-a-bonfire-festival-photos-of-the-day-wednesday
+        <li>
+          <a
+            href="./lightbox.html?article=/world/picture/2016/nov/16/eyewitness-nairobi-kenya"
+          >
+            Eyewitness: Nairobi, Kenya
+          </a>
         </li>
-        <li data-info="content">
-          /fashion/2015/oct/17/unisex-perfume-sali-hughes-beauty
+        <li>
+          <a
+            href="./lightbox.html?article=/news/gallery/2024/jan/17/snowy-mountains-and-a-bonfire-festival-photos-of-the-day-wednesday"
+          >
+            Snowy mountains and a bonfire festival: photos of the day –
+            Wednesday
+          </a>
+        </li>
+        <li>
+          <a
+            href="./lightbox.html?article=/fashion/2015/oct/17/unisex-perfume-sali-hughes-beauty"
+          >
+            Beauty: why unisex fragrances are not to be sniffed at
+          </a>
         </li>
       </ul>
     </main>
