@@ -14,4 +14,12 @@ const resized = (master) => {
   return new URL(`${path}?${params.toString()}`, "https://i.guim.co.uk").href;
 };
 
-export { resized, width };
+/** @param {NonNullable<import("./capi.js").Search["response"]["results"][number]["elements"]>} elements */
+const get_images = (elements) =>
+  elements.filter(({ relation }) => relation !== "thumbnail")
+    .flatMap(({ assets }) => {
+      const asset = assets.find((asset) => asset.file.includes("/master/"));
+      return asset ? [asset.file] : [];
+    });
+
+export { get_images, resized, width };

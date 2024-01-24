@@ -1,20 +1,64 @@
 import { follow } from "./threads.js";
 import { key } from "./key.js";
-import { resized, width } from "./images.js";
+import { get_images, resized, width } from "./images.js";
+import { base, content } from "./capi.js";
 
 /** Setup **/
 key;
-const ul = document.querySelector("ul");
+const lightbox = document.querySelector("ul#lightbox");
 const [previous, next] = document
   .querySelector("nav")
   ?.querySelectorAll("button") ?? [];
 
-if (!ul || !previous || !next) throw ("No lightbox");
+if (!(lightbox instanceof HTMLUListElement) || !previous || !next) {
+  throw ("No lightbox");
+}
 
-// const id = "/world/picture/2016/nov/20/eyewitness-seoul";
-const date = new Date(1479658237000);
-const tag = new URLSearchParams(window.location.search).get("tag") ??
+const article = new URLSearchParams(window.location.search).get("article") ??
+  "/world/picture/2016/nov/20/eyewitness-seoul";
+
+const params = new URLSearchParams({
+  "show-elements": ["image", "cartoon"].join(","), // maybe `all`
+  "show-tags": ["series"].join(","), // maybe `all`
+  "api-key": key.value,
+});
+const url = new URL(`${article}?${params.toString()}`, base);
+const { response } = await fetch(url, { "mode": "cors" })
+  .then((response) => response.json())
+  .then((json) => content(json));
+
+const date = response.content.webPublicationDate;
+const tag = response.content.tags.find(({ type }) => type === "series")?.id ??
   "world/series/eyewitness";
+
+/**
+ * @param {object} image
+ * @param {string} image.src
+ * @param {URL} image.url
+ * @param {string} image.title
+ */
+const create_li = (image) => {
+  const li = document.createElement("li");
+  const img = document.createElement("img");
+  img.src = resized(image.src);
+  img.width = width;
+  img.loading = "lazy";
+  const a = document.createElement("a");
+  a.href = image.url.href;
+  a.innerText = image.title;
+  li.append(a, img);
+  return li;
+};
+
+const lis = get_images(response.content.elements).map((src) =>
+  create_li({
+    src,
+    url: response.content.webUrl,
+    title: response.content.webTitle,
+  })
+);
+let [current] = lis;
+lightbox.append(...lis);
 
 /** Events **/
 
@@ -22,7 +66,7 @@ const event = new Event("lightbox:scrolled");
 
 /** @type {number} */
 let timer;
-ul.addEventListener("scroll", () => {
+lightbox.addEventListener("scroll", () => {
   clearTimeout(timer);
   timer = setTimeout(() => {
     document.dispatchEvent(event);
@@ -30,137 +74,53 @@ ul.addEventListener("scroll", () => {
   }, 60);
 });
 
-const min = 0;
-let index = 0;
-const images = [{
-  src:
-    "https://media.guim.co.uk/00dc6fb9bf3c5482e6c41f11a6ea711c3d996406/0_0_5568_3712/master/5568.jpg",
-  title: "Eyewitness: Seoul",
-  href:
-    "https://www.theguardian.com/world/picture/2016/nov/20/eyewitness-seoul",
-}];
-
-const [first, middle, last] = [...ul.querySelectorAll("li")];
-
-middle.scrollIntoView();
-
 const toggleButtons = () => {
-  console.log({ min, index, length: images.length });
-  previous.disabled = index <= min;
-  next.disabled = index >= images.length - 1;
+  previous.disabled = !current?.previousSibling;
+  next.disabled = !current?.nextElementSibling;
 };
-
-/** @param {NonNullable<import("./capi.js").Search["response"]["results"][number]["elements"]>} elements */
-const get_images = (elements) =>
-  elements.filter(({ relation }) => relation !== "thumbnail")
-    .flatMap(({ assets }) => {
-      const asset = assets.find((asset) => asset.file.includes("/master/"));
-      return asset ? [asset.file] : [];
-    });
 
 const before = follow({ tag, date, key: key.value, direction: "past" });
 const prepend = async () => {
-  const next = await before.next();
-  if (next.done) return;
-  const extra_images = get_images(next.value.elements ?? []);
-  images.unshift(
-    ...extra_images.map((src) => ({
-      src,
-      href: next.value.webUrl.href,
-      title: next.value.webTitle,
-    })),
+  const { done, value } = await before.next();
+  if (done) return toggleButtons();
+  const lis = get_images(value.elements).map((src) =>
+    create_li({ src, url: value.webUrl, title: value.webTitle })
   );
-  index += extra_images.length;
-};
-const past = async () => {
-  await prepend();
-  index = Math.max(index - 1, min);
+  lightbox.prepend(...lis);
+  current?.scrollIntoView();
   toggleButtons();
-  if (index <= min) {
-    first.scrollIntoView();
-    return;
-  } else if (index + 1 === images.length - 1) {
-    middle.scrollIntoView();
-    return;
-  }
-  last.replaceChildren(...middle.childNodes);
-  middle.replaceChildren(...first.childNodes);
+};
 
-  const image = images[index - 1];
-  const img = document.createElement("img");
-  img.src = resized(image.src);
-  img.width = width;
-  const a = document.createElement("a");
-  a.href = image.href;
-  a.innerText = image.title;
-  first.replaceChildren(img, a);
-  middle.scrollIntoView();
+const past = () => {
+  current?.previousElementSibling?.scrollIntoView();
+  document.dispatchEvent(event);
 };
 
 const after = follow({ tag, date, key: key.value, direction: "future" });
 const append = async () => {
-  const next = await after.next();
-  if (next.done) return;
-  const extra_images = get_images(next.value.elements ?? []);
-  images.push(
-    ...extra_images.map((src) => ({
-      src,
-      href: next.value.webUrl.href,
-      title: next.value.webTitle,
-    })),
+  const { done, value } = await after.next();
+  if (done) return toggleButtons();
+  const lis = get_images(value.elements).map((src) =>
+    create_li({ src, url: value.webUrl, title: value.webTitle })
   );
-};
-const future = async () => {
-  await append();
-  index = Math.min(index + 1, images.length - 1);
+  lightbox.append(...lis);
+  current?.scrollIntoView();
   toggleButtons();
-  if (index >= images.length - 1) {
-    last.scrollIntoView();
-    return;
-  } else if (index - 1 === min) {
-    middle.scrollIntoView();
-    return;
-  }
-  first.replaceChildren(...middle.childNodes);
-  middle.replaceChildren(...last.childNodes);
-
-  const image = images[index + 1];
-  const img = document.createElement("img");
-  img.src = resized(image.src);
-  img.width = width;
-  const a = document.createElement("a");
-  a.href = image.href;
-  a.innerText = image.title;
-  last.replaceChildren(img, a);
-  middle.scrollIntoView();
+};
+const future = () => {
+  current?.nextElementSibling?.scrollIntoView();
+  document.dispatchEvent(event);
 };
 
-const setup = async () => {
-  await Promise.all([append(), prepend()]);
-
-  const first_image = images[index - 1];
-  const last_image = images[index + 1];
-  if (first_image) {
-    const img = document.createElement("img");
-    img.src = resized(first_image.src);
-    img.width = width;
-    const a = document.createElement("a");
-    a.href = first_image.href;
-    a.innerText = first_image.title;
-    first.replaceChildren(img, a);
-  }
-  if (last_image) {
-    const img = document.createElement("img");
-    img.src = resized(last_image.src);
-    img.width = width;
-    const a = document.createElement("a");
-    a.href = first_image.href;
-    a.innerText = first_image.title;
-    last.replaceChildren(img, a);
-  }
-};
-
-await setup();
+// fill with some initial images
+await Promise.all([
+  append(),
+  append(),
+  append(),
+  prepend(),
+  prepend(),
+  prepend(),
+]);
 
 document.addEventListener("click", (event) => {
   switch (event.target) {
@@ -172,16 +132,17 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener(event.type, () => {
-  const width = ul.clientWidth;
-  const position = Math.round(2 * (ul.scrollLeft + width / 2) / ul.scrollWidth);
-  switch (position) {
-    case 0:
-      return requestAnimationFrame(past);
-    case 1:
-      return;
-    case 2:
-      return requestAnimationFrame(future);
-  }
+  const lis = lightbox.querySelectorAll("li");
+  const position = Math.round(
+    lis.length * lightbox.scrollLeft / lightbox.scrollWidth,
+  );
+  current = lis[position];
+
+  const left = position;
+  const right = lis.length - 1 - position;
+
+  void Promise.all(Array.from({ length: 6 - left }, () => prepend()));
+  void Promise.all(Array.from({ length: 6 - right }, () => append()));
 });
 
 document.addEventListener("keydown", (event) => {
@@ -193,14 +154,14 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-const input = document.querySelector("input#tag");
-if (!(input instanceof HTMLInputElement)) throw Error("No tag input");
+const input = document.querySelector("input#article");
+if (!(input instanceof HTMLInputElement)) throw Error("No article input");
+input.value = tag;
 
-input.addEventListener("input", (event) => {
+document.querySelector("header")?.addEventListener("input", (event) => {
   if (!(event.target instanceof HTMLInputElement)) return;
 
-  window.location.search = new URLSearchParams({ tag: event.target.value.trim() })
-    .toString();
+  const params = new URLSearchParams(location.search);
+  params.set(event.target.id, event.target.value.trim());
+  window.location.search = params.toString();
 });
-
-input.value = tag;

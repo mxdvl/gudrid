@@ -29,7 +29,8 @@
         margin: 0;
         display: grid;
         height: 90vh;
-        grid-template-columns: repeat(3, 100vw);
+        grid-auto-flow: column;
+        grid-auto-columns: 100vw;
         /* gap: 4vw; */
         list-style-type: none;
         overflow-x: scroll;
@@ -54,6 +55,7 @@
         display: block;
         margin: auto;
         max-width: 90%;
+        max-height: 90%;
         object-fit: contain;
       }
 
@@ -72,7 +74,12 @@
         <a href="https://bonobo.capi.gutools.co.uk/">(get one)</a>
       </label>
       <label
-        >Tag: <input type="text" id="tag" value="world/series/eyewitness" />
+        >Article:
+        <input
+          type="text"
+          id="article"
+          value="/world/picture/2016/nov/20/eyewitness-seoul"
+        />
       </label>
       <nav>
         <button type="button" class="previous">&larr;</button>
@@ -81,20 +88,7 @@
     </header>
 
     <main>
-      <ul>
-        <li id="previous"></li>
-        <li id="current">
-          <img
-            src="https://i.guim.co.uk/img/media/00dc6fb9bf3c5482e6c41f11a6ea711c3d996406/0_0_5568_3712/master/5568.jpg?width=1200&dpr=2&s=none"
-            alt="Current"
-          />
-          <a
-            href="https://www.theguardian.com/world/picture/2016/nov/20/eyewitness-seoul"
-            >Eyewitness: Seoul (20 Nov 2016)
-          </a>
-        </li>
-        <li id="next"></li>
-      </ul>
+      <ul id="lightbox"></ul>
     </main>
 
     <footer></footer>

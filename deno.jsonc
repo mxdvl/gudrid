@@ -5,6 +5,7 @@
   },
   "compilerOptions": {
     "checkJs": true,
+    "noUncheckedIndexedAccess": true,
     "lib": ["dom", "dom.iterable", "deno.ns"]
   }
 }

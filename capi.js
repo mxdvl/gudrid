@@ -44,9 +44,9 @@ const result = object({
   type: string(), // ["tag", "article", "picture", "liveblog"]
   webPublicationDate: transform(string(), (input) => new Date(input)),
   webTitle: string(),
-  tags: optional(array(tag)),
+  tags: optional(array(tag), []),
   webUrl: transform(string([url()]), (input) => new URL(input)),
-  elements: optional(array(element)),
+  elements: optional(array(element), []),
 });
 
 const search_schema = object({
