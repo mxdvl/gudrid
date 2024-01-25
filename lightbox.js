@@ -21,7 +21,7 @@ const article = new URLSearchParams(window.location.search).get("article") ??
 const params = new URLSearchParams({
   "show-elements": ["image", "cartoon"].join(","), // maybe `all`
   "show-tags": ["series"].join(","), // maybe `all`
-  "api-key": key.value,
+  "api-key": key,
 });
 const url = new URL(`${article}?${params.toString()}`, base);
 const { response } = await fetch(url, { "mode": "cors" })
@@ -89,7 +89,7 @@ const toggleButtons = () => {
   }).map((img) => img.loading = "eager");
 };
 
-const before = follow({ tag, date, key: key.value, direction: "past" });
+const before = follow({ tag, date, key, direction: "past" });
 const prepend = async () => {
   const { done, value } = await before.next();
   if (done) return toggleButtons();
@@ -106,7 +106,7 @@ const past = () => {
   document.dispatchEvent(event);
 };
 
-const after = follow({ tag, date, key: key.value, direction: "future" });
+const after = follow({ tag, date, key, direction: "future" });
 const append = async () => {
   const { done, value } = await after.next();
   if (done) return toggleButtons();
@@ -172,14 +172,13 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-const input = document.querySelector("input#article");
-if (!(input instanceof HTMLInputElement)) throw Error("No article input");
-input.value = article;
+const input = document.getElementsByTagName("input").namedItem("article");
+if (input) {
+  input.value = article;
 
-document.querySelector("header")?.addEventListener("input", (event) => {
-  if (!(event.target instanceof HTMLInputElement)) return;
-
-  const params = new URLSearchParams(location.search);
-  params.set(event.target.id, event.target.value.trim());
-  window.location.search = params.toString();
-});
+  input.addEventListener("change", () => {
+    const params = new URLSearchParams(location.search);
+    params.set(input.name, input.value.trim());
+    window.location.search = params.toString();
+  });
+}
