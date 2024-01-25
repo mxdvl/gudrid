@@ -9,6 +9,10 @@ if (input) {
   input.addEventListener("input", () => {
     localStorage.setItem("api-key", input.value);
   });
+
+  input.addEventListener("change", () => {
+    window.location.reload();
+  });
 }
 
 export { key };
