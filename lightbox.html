@@ -9,11 +9,13 @@
       body {
         padding: 0;
         margin: 0;
-        color-scheme: dark;
+        height: 100dvh;
+        color-scheme: only dark;
         display: grid;
         font-family: system-ui, sans-serif;
         background-color: Canvas;
         color: CanvasText;
+        grid-template-rows: 6rem calc(100dvh - 6rem);
       }
 
       header {
@@ -28,9 +30,10 @@
         padding: 0;
         margin: 0;
         display: grid;
-        height: 90vh;
+        height: 100%;
         grid-auto-flow: column;
         grid-auto-columns: 100vw;
+        grid-template-rows: 1fr;
         /* gap: 4vw; */
         list-style-type: none;
         overflow-x: scroll;
