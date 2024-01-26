@@ -42,16 +42,20 @@
 
       li {
         scroll-snap-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        display: grid;
+        grid-template-rows: 2rem auto;
+        height: 100%;
+      }
+
+      li a {
+        margin: auto;
       }
 
       li img {
         display: block;
         margin: auto;
-        max-width: 90%;
-        max-height: 90%;
+        max-width: 96%;
+        max-height: 96%;
         object-fit: contain;
       }
 
