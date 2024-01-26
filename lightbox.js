@@ -67,6 +67,7 @@ const lis = get_images(response.content.elements).map((
 );
 let [current] = lis;
 lightbox.append(...lis);
+current?.scrollIntoView()
 
 /** Events **/
 
