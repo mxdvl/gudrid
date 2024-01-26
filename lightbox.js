@@ -38,6 +38,8 @@ const tag = response.content.tags.find(({ type }) => type === "series")?.id ??
  * @param {string} image.src
  * @param {URL} image.url
  * @param {string} image.title
+ * @param {number} image.index
+ * @param {number} image.length
  * @param {HTMLImageElement["loading"]} [image.loading]
  */
 const create_li = (image) => {
@@ -48,17 +50,23 @@ const create_li = (image) => {
   img.loading = image.loading ?? "lazy";
   const a = document.createElement("a");
   a.href = image.url.href;
-  a.innerText = image.title;
+  a.innerText = `${image.title} (${image.index + 1} / ${image.length})`;
   li.append(a, img);
   return li;
 };
 
-const lis = get_images(response.content.elements).map((src) =>
+const lis = get_images(response.content.elements).map((
+  src,
+  index,
+  { length },
+) =>
   create_li({
     src,
     url: response.content.webUrl,
     title: response.content.webTitle,
     loading: "eager",
+    index,
+    length,
   })
 );
 let [current] = lis;
@@ -93,8 +101,8 @@ const before = follow({ tag, date, key, direction: "past" });
 const prepend = async () => {
   const { done, value } = await before.next();
   if (done) return toggleButtons();
-  const lis = get_images(value.elements).map((src) =>
-    create_li({ src, url: value.webUrl, title: value.webTitle })
+  const lis = get_images(value.elements).map((src, index, { length }) =>
+    create_li({ src, url: value.webUrl, title: value.webTitle, index, length })
   );
   lightbox.prepend(...lis);
   current?.scrollIntoView();
@@ -110,8 +118,8 @@ const after = follow({ tag, date, key, direction: "future" });
 const append = async () => {
   const { done, value } = await after.next();
   if (done) return toggleButtons();
-  const lis = get_images(value.elements).map((src) =>
-    create_li({ src, url: value.webUrl, title: value.webTitle })
+  const lis = get_images(value.elements).map((src, index, { length }) =>
+    create_li({ src, url: value.webUrl, title: value.webTitle, index, length })
   );
   lightbox.append(...lis);
   current?.scrollIntoView();
