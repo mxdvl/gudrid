@@ -38,8 +38,6 @@ const tag = response.content.tags.find(({ type }) => type === "series")?.id ??
  * @param {string} image.src
  * @param {URL} image.url
  * @param {string} image.title
- * @param {number} image.index
- * @param {number} image.length
  * @param {HTMLImageElement["loading"]} [image.loading]
  */
 const create_li = (image) => {
@@ -50,7 +48,7 @@ const create_li = (image) => {
   img.loading = image.loading ?? "lazy";
   const a = document.createElement("a");
   a.href = image.url.href;
-  a.innerText = `${image.title} (${image.index + 1} / ${image.length})`;
+  a.innerText = image.title;
   li.append(a, img);
   return li;
 };
@@ -63,10 +61,8 @@ const lis = get_images(response.content.elements).map((
   create_li({
     src,
     url: response.content.webUrl,
-    title: response.content.webTitle,
+    title: `${response.content.webTitle} (${index + 1} / ${length})`,
     loading: "eager",
-    index,
-    length,
   })
 );
 let [current] = lis;
@@ -97,14 +93,36 @@ const toggleButtons = () => {
   }).map((img) => img.loading = "eager");
 };
 
-const before = follow({ tag, date, key, direction: "past" });
+/**
+ * @param {object} options
+ * @param {string} options.tag
+ * @param {Date} options.date
+ * @param {string} options.key
+ * @param {'future' | 'past'} options.direction
+ */
+async function* images({ tag, date, key, direction }) {
+  for await (const article of follow({ tag, date, key, direction })) {
+    const images = get_images(article.elements).map(
+      (src, index, { length }) => ({
+        src,
+        url: article.webUrl,
+        title: `${article.webTitle} (${index + 1} / ${length})`,
+      }),
+    ).map(create_li);
+
+    if (direction === "future") images.reverse();
+
+    for (const li of images) {
+      yield li;
+    }
+  }
+}
+
+const left = images({ tag, date, key, direction: "future" });
 const prepend = async () => {
-  const { done, value } = await before.next();
+  const { done, value } = await left.next();
   if (done) return toggleButtons();
-  const lis = get_images(value.elements).map((src, index, { length }) =>
-    create_li({ src, url: value.webUrl, title: value.webTitle, index, length })
-  );
-  lightbox.prepend(...lis);
+  lightbox.prepend(value);
   current?.scrollIntoView();
   toggleButtons();
 };
@@ -114,14 +132,11 @@ const past = () => {
   document.dispatchEvent(event);
 };
 
-const after = follow({ tag, date, key, direction: "future" });
+const right = images({ tag, date, key, direction: "past" });
 const append = async () => {
-  const { done, value } = await after.next();
+  const { done, value } = await right.next();
   if (done) return toggleButtons();
-  const lis = get_images(value.elements).map((src, index, { length }) =>
-    create_li({ src, url: value.webUrl, title: value.webTitle, index, length })
-  );
-  lightbox.append(...lis);
+  lightbox.append(value);
   current?.scrollIntoView();
   toggleButtons();
 };
@@ -172,6 +187,7 @@ document.addEventListener(event.type, () => {
 
 document.addEventListener("keydown", (event) => {
   if (event.target instanceof HTMLInputElement) return;
+  event.preventDefault();
   switch (event.key) {
     case "ArrowLeft":
       return requestAnimationFrame(past);
