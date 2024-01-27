@@ -35,7 +35,7 @@ const tag = object({
   type: string(),
   // sectionId: string(),
   webTitle: string(),
-  description: string(),
+  description: optional(string(), ""),
 });
 
 const result = object({

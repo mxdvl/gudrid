@@ -188,11 +188,12 @@ document.addEventListener(event.type, () => {
 
 document.addEventListener("keydown", (event) => {
   if (event.target instanceof HTMLInputElement) return;
-  event.preventDefault();
   switch (event.key) {
     case "ArrowLeft":
+      event.preventDefault();
       return requestAnimationFrame(past);
-    case "ArrowRight":
+      case "ArrowRight":
+      event.preventDefault();
       return requestAnimationFrame(future);
   }
 });
