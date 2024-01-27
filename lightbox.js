@@ -3,6 +3,7 @@ import { key } from "./key.js";
 import { get_images, resized, width } from "./images.js";
 import { base, content } from "./capi.js";
 import { default_content } from "./fallbacks.js";
+import { ValiError } from "https://esm.sh/valibot@0.26.0";
 
 /** Setup **/
 key;
@@ -20,18 +21,23 @@ const article = new URLSearchParams(window.location.search).get("article") ??
 
 const params = new URLSearchParams({
   "show-elements": ["image", "cartoon"].join(","), // maybe `all`
-  "show-tags": ["series"].join(","), // maybe `all`
+  "show-tags": ["series", "contributor", "tone"].join(","), // maybe `all`
   "api-key": key,
 });
 const url = new URL(`${article}?${params.toString()}`, base);
 const { response } = await fetch(url, { "mode": "cors" })
   .then((response) => response.json())
   .then((json) => content(json))
-  .catch(() => default_content);
+  .catch((error) => {
+    if (error instanceof ValiError) {
+      console.error(error.issues);
+    }
+    return default_content;
+  });
 
 const date = response.content.webPublicationDate;
 const tag = response.content.tags.find(({ type }) => type === "series")?.id ??
-  "world/series/eyewitness";
+  response.content.tags[0]?.id;
 
 /**
  * @param {object} image
@@ -67,7 +73,7 @@ const lis = get_images(response.content.elements).map((
 );
 let [current] = lis;
 lightbox.append(...lis);
-current?.scrollIntoView()
+current?.scrollIntoView();
 
 /** Events **/
 
@@ -117,6 +123,14 @@ async function* images({ tag, date, key, direction }) {
       yield li;
     }
   }
+}
+
+if (!tag) {
+  console.error(response.content);
+  const li = document.createElement("li");
+  li.innerText = "Could not find a tag for this article";
+  lightbox.append(li);
+  throw Error("Could not find any tag");
 }
 
 const left = images({ tag, date, key, direction: "future" });
