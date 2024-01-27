@@ -10,7 +10,7 @@ const resized = (master) => {
     width: String(width),
     s: "none",
   });
-  console.log(path);
+
   return new URL(`${path}?${params.toString()}`, "https://i.guim.co.uk").href;
 };
 
