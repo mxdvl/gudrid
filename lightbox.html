@@ -33,7 +33,7 @@
         height: 100%;
         grid-auto-flow: column;
         grid-auto-columns: 100vw;
-        grid-template-rows: 1fr;
+        grid-template-rows: 100%;
         /* gap: 4vw; */
         list-style-type: none;
         overflow-x: scroll;
@@ -46,7 +46,7 @@
       li {
         scroll-snap-align: center;
         display: grid;
-        grid-template-rows: 2rem auto;
+        grid-template-rows: 2rem minmax(0, 1fr);
         height: 100%;
       }
 
