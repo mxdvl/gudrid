@@ -68,6 +68,19 @@ const content_schema = object({
   }),
 });
 
+const atoms_response_schema = object({
+  response: object({
+    status: literal("ok"),
+    total: number(),
+    pages: number(),
+    currentPage: number(),
+    results: array(object({
+      "id": string(),
+      "atomType": string(),
+    })),
+  }),
+});
+
 /** @typedef {ReturnType<typeof search>} Search */
 /**
  * @param {unknown} response
@@ -80,6 +93,12 @@ const search = (response) => parse(search_schema, response);
  */
 const content = (response) => parse(content_schema, response);
 
+/** @typedef {ReturnType<typeof atoms>} Atoms */
+/**
+ * @param {unknown} response
+ */
+const atoms = (response) => parse(atoms_response_schema, response);
+
 const base = "https://content.guardianapis.com/";
 
-export { base, content, search };
+export { atoms, base, content, search };
