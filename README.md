@@ -1,7 +1,7 @@
-# Ariadne
+# Gudrid
 
-Navigate the Guardian’s threads
+Exploring the Guardian’s sprawling web of content.
 
 ---
 
-A project by @paperboyo & @mxdvl
+A project by @mxdvl with special assistance from @paperboyo
