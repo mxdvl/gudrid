@@ -6,7 +6,6 @@ import { default_content } from "./fallbacks.js";
 import { ValiError } from "https://esm.sh/valibot@0.26.0";
 
 /** Setup **/
-key;
 const lightbox = document.querySelector("ul#lightbox");
 const [previous, next] = document
   .querySelector("nav")
@@ -206,7 +205,7 @@ document.addEventListener("keydown", (event) => {
     case "ArrowLeft":
       event.preventDefault();
       return requestAnimationFrame(past);
-      case "ArrowRight":
+    case "ArrowRight":
       event.preventDefault();
       return requestAnimationFrame(future);
   }

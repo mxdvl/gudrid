@@ -11,7 +11,6 @@ import {
 import { atoms } from "./capi.js";
 
 /** Setup **/
-key;
 const ul = document.querySelector("ul#atoms");
 const more = document.querySelector("button#more");
 
