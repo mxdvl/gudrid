@@ -3,5 +3,8 @@
   "redirects": {
     "https://esm.sh/valibot": "https://esm.sh/valibot@0.26.0"
   },
-  "remote": {}
+  "remote": {
+    "https://esm.sh/v135/valibot@0.26.0/denonext/valibot.mjs": "dd0970766fe277c2c7b5d247085c9f4adca1ddf34de83e5c261fd380d784d241",
+    "https://esm.sh/valibot@0.26.0": "4db3b5d676f28112ccf99a741af5c9c62060d6cacec793d758843108fa8781ca"
+  }
 }

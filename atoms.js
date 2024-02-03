@@ -6,6 +6,7 @@ import {
   object,
   parse,
   string,
+  transform,
   ValiError,
 } from "https://esm.sh/valibot@0.26.0";
 import { atoms } from "./capi.js";
@@ -19,10 +20,10 @@ if (!(ul instanceof HTMLUListElement) || !(more instanceof HTMLButtonElement)) {
 }
 
 /**
- * @param {object} interactive
+ * @param {Object} interactive
  * @param {URL} interactive.url
  * @param {string} interactive.title
- * @param {string[]} interactive.usage
+ * @param {readonly string[]} interactive.usage
  */
 const create_li = (interactive) => {
   const li = document.createElement("li");
@@ -33,8 +34,6 @@ const create_li = (interactive) => {
   }</ul>`;
 
   li.dataset.count = String(interactive.usage.length);
-
-  console.log(li);
 
   return li;
 };
@@ -80,6 +79,16 @@ const get_atoms = async (page = 1, types = []) => {
   };
 };
 
+const usage_schema = transform(
+  object({
+    response: object({
+      status: literal("ok"),
+      results: array(string()),
+    }),
+  }),
+  ({ response }) => /** @const */ (response.results),
+);
+
 /** @param {string[]} types */
 async function* get_all_atoms(types = []) {
   let { next_page, results } = await get_atoms(1, types);
@@ -91,27 +100,20 @@ async function* get_all_atoms(types = []) {
       ({ next_page, results } = await get_atoms(next_page, types));
     }
 
-    const { response } = await fetch(
+    /** @type {readonly string[]} */
+    const usage = await fetch(
       `https://content.guardianapis.com/atom/interactive/${result.id}/usage?api-key=${key}`,
     )
       .then((response) => response.json())
-      .then((json) =>
-        parse(
-          object({
-            response: object({
-              status: literal("ok"),
-              results: array(string()),
-            }),
-          }),
-          json,
-        )
-      );
+      .then((json) => parse(usage_schema, json))
+      .catch(() => []);
 
-    yield {
+    yield /** @type {const} */ ({
       id: result.id,
       type: result.atomType,
-      usage: response.results,
-    };
+      usage,
+      thing: ["a", "b"],
+    });
   }
 }
 
