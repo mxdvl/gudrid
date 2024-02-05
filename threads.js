@@ -1,5 +1,7 @@
 import { base, search } from "./capi.js";
 
+/** @typedef {import('./capi.js').Search["response"]["results"][number]} Article */
+
 /**
  * @param {object} options
  * @param {string} options.tag
@@ -35,17 +37,31 @@ const fetch_content = async ({
 
   const url = new URL(`/search?${params.toString()}`, base);
 
-  const results = await fetch(url, { "mode": "cors" })
+  const { total, results } = await fetch(url, { "mode": "cors" })
     .then((response) => response.json())
-    .then((json) => search(json).response.results)
-    .catch(() => []);
+    .then((json) => search(json).response)
+    .catch(() => ({
+      total: 0,
+      results: /** @type {Article[]} */ ([]),
+    }));
 
-  /** @type {(result: typeof results[number])=> boolean} */
-  const isBefore = ({ webPublicationDate }) => webPublicationDate < date;
-  /** @type {(result: typeof results[number])=> boolean} */
-  const isAfter = ({ webPublicationDate }) => webPublicationDate > date;
+  const { before, after, same } = results.reduce((accumulator, result) => {
+    if (result.webPublicationDate === date) accumulator.same.push(result);
+    if (result.webPublicationDate < date) accumulator.before.push(result);
+    if (result.webPublicationDate > date) accumulator.after.push(result);
+    return accumulator;
+  }, {
+    before: /** @type {Article[]} */ ([]),
+    after: /** @type {Article[]} */ ([]),
+    same: /** @type {Article[]} */ ([]),
+  });
 
-  return results.filter(direction === "future" ? isAfter : isBefore);
+  console.info({ total, after, before, same });
+
+  const count = total - same.length -
+    (direction === "future" ? before.length : after.length);
+
+  return { articles: direction === "future" ? after : before, count };
 };
 
 /**
@@ -56,23 +72,28 @@ const fetch_content = async ({
  * @param {'future' | 'past'} options.direction
  */
 async function* follow({ tag, date, key, direction }) {
-  const after = await fetch_content({ date, key, tag, direction });
+  const { articles, count } = await fetch_content({
+    date,
+    key,
+    tag,
+    direction,
+  });
 
-  while (after.length > 0) {
-    const next = after.shift();
-    if (!next) return;
-    if (after.length === 0) {
-      after.push(
+  while (articles.length > 0) {
+    const article = articles.shift();
+    if (!article) return;
+    if (articles.length === 0) {
+      articles.push(
         ...await fetch_content({
-          date: next.webPublicationDate,
+          date: article.webPublicationDate,
           key,
           tag,
           direction,
-        }),
+        }).then(({ articles }) => articles),
       );
     }
 
-    yield next;
+    yield { article, count };
   }
 }
 

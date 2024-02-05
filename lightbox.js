@@ -99,6 +99,10 @@ const toggleButtons = () => {
   }).map((img) => img.loading = "eager");
 };
 
+// @TODO: handle movement through the articles
+let before = 0;
+let after = 0;
+
 /**
  * @param {object} options
  * @param {string} options.tag
@@ -107,7 +111,12 @@ const toggleButtons = () => {
  * @param {'future' | 'past'} options.direction
  */
 async function* images({ tag, date, key, direction }) {
-  for await (const article of follow({ tag, date, key, direction })) {
+  for await (
+    const { article, count } of follow({ tag, date, key, direction })
+  ) {
+    if (direction === "future") after += count;
+    if (direction === "past") before += count;
+
     const images = get_images(article.elements).map(
       (src, index, { length }) => ({
         src,
