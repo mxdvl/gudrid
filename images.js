@@ -1,6 +1,10 @@
 const width = 1200;
 
-/** @param {string} master */
+/** @type {
+  (master: string)
+=>
+  string
+} */
 const resized = (master) => {
   const url = new URL(master);
   const [bucket] = url.hostname.split(".");
@@ -14,7 +18,11 @@ const resized = (master) => {
   return new URL(`${path}?${params.toString()}`, "https://i.guim.co.uk").href;
 };
 
-/** @param {NonNullable<import("./capi.js").Search["response"]["results"][number]["elements"]>} elements */
+/** @type {
+  (elements: NonNullable<import("./capi.js").Search["response"]["results"][number]["elements"]>)
+=>
+ string[]
+} */
 const get_images = (elements) =>
   elements.filter(({ relation }) => relation !== "thumbnail")
     .flatMap(({ assets }) => {

@@ -11,7 +11,8 @@ import {
 } from "https://esm.sh/valibot@0.26.0";
 import { atoms } from "./capi.js";
 
-/** Setup **/
+// –– initial set up –– //
+
 const ul = document.querySelector("ul#atoms");
 const more = document.querySelector("button#more");
 
@@ -19,12 +20,17 @@ if (!(ul instanceof HTMLUListElement) || !(more instanceof HTMLButtonElement)) {
   throw Error("No Unordered List Element");
 }
 
-/**
- * @param {Object} interactive
- * @param {URL} interactive.url
- * @param {string} interactive.title
- * @param {readonly string[]} interactive.usage
- */
+// –– methods –– //
+
+/** @type {
+  (interactive: Readonly<{
+    url: Readonly<URL>,
+    title: string,
+    usage: readonly string[]
+  }>)
+=>
+  HTMLLIElement
+} */
 const create_li = (interactive) => {
   const li = document.createElement("li");
   li.innerHTML = `${interactive.title}<ul>${
@@ -38,10 +44,14 @@ const create_li = (interactive) => {
   return li;
 };
 
-/**
- * @param {number} page
- * @param {string[]} types
- */
+/** @type {
+  (page?: number, types?: readonly string[])
+=>
+  Promise<{
+    results: Array<{ id: string, atomType: string }>
+    next_page: number | undefined
+  }>
+} */
 const get_atoms = async (page = 1, types = []) => {
   const params = new URLSearchParams({
     "api-key": key,
@@ -86,10 +96,14 @@ const usage_schema = transform(
       results: array(string()),
     }),
   }),
-  ({ response }) => /** @const */ (response.results),
+  ({ response }) => response.results,
 );
 
-/** @param {string[]} types */
+/** @type {
+  (types?: readonly string[])
+=>
+  AsyncGenerator<{id: string, type: string, usage: string[]}>
+} */
 async function* get_all_atoms(types = []) {
   let { next_page, results } = await get_atoms(1, types);
 
@@ -100,7 +114,6 @@ async function* get_all_atoms(types = []) {
       ({ next_page, results } = await get_atoms(next_page, types));
     }
 
-    /** @type {readonly string[]} */
     const usage = await fetch(
       `https://content.guardianapis.com/atom/interactive/${result.id}/usage?api-key=${key}`,
     )
@@ -108,11 +121,10 @@ async function* get_all_atoms(types = []) {
       .then((json) => parse(usage_schema, json))
       .catch(() => []);
 
-    yield /** @type {const} */ ({
+    yield ({
       id: result.id,
       type: result.atomType,
       usage,
-      thing: ["a", "b"],
     });
   }
 }

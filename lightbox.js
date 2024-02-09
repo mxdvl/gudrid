@@ -38,22 +38,26 @@ const date = response.content.webPublicationDate;
 const tag = response.content.tags.find(({ type }) => type === "series")?.id ??
   response.content.tags[0]?.id;
 
-/**
- * @param {object} image
- * @param {string} image.src
- * @param {URL} image.url
- * @param {string} image.title
- * @param {HTMLImageElement["loading"]} [image.loading]
- */
-const create_li = (image) => {
+/** @type {(image: Readonly<{
+ src: string;
+ url: Readonly<URL>;
+ title: string;
+ loading?: HTMLImageElement["loading"];
+}>) => HTMLLIElement} */
+const create_li = ({
+  src,
+  url,
+  title,
+  loading = "lazy",
+}) => {
   const li = document.createElement("li");
   const img = document.createElement("img");
-  img.src = resized(image.src);
+  img.src = resized(src);
   img.width = width;
-  img.loading = image.loading ?? "lazy";
+  img.loading = loading ?? "lazy";
   const a = document.createElement("a");
-  a.href = image.url.href;
-  a.innerText = image.title;
+  a.href = url.href;
+  a.innerText = title;
   li.append(a, img);
   return li;
 };
@@ -93,19 +97,23 @@ const toggleButtons = () => {
   const { previousElementSibling, nextElementSibling } = current;
   previous.disabled = !previousElementSibling;
   next.disabled = !nextElementSibling;
-  [previousElementSibling, nextElementSibling].flatMap((li) => {
+
+  const images = [previousElementSibling, nextElementSibling].flatMap((li) => {
     const img = li?.querySelector("img");
     return img instanceof HTMLImageElement ? [img] : [];
-  }).map((img) => img.loading = "eager");
+  });
+
+  for (const image of images) {
+    image.loading = "eager";
+  }
 };
 
-/**
- * @param {object} options
- * @param {string} options.tag
- * @param {Date} options.date
- * @param {string} options.key
- * @param {'future' | 'past'} options.direction
- */
+/** @type {(options: Readonly<{
+  tag: string,
+  date: Readonly<Date>,
+  key: string,
+  direction: 'future' | 'past' ,
+}>) => AsyncGenerator<HTMLLIElement, undefined>} */
 async function* images({ tag, date, key, direction }) {
   for await (const article of follow({ tag, date, key, direction })) {
     const images = get_images(article.elements).map(

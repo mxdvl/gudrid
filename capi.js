@@ -81,22 +81,28 @@ const atoms_response_schema = object({
   }),
 });
 
-/** @typedef {ReturnType<typeof search>} Search */
-/**
- * @param {unknown} response
- */
+/** @typedef {import('https://esm.sh/valibot@0.26.0').Output<typeof search_schema>} Search */
+/** @type {
+  (response: unknown)
+=>
+  Search
+}*/
 const search = (response) => parse(search_schema, response);
 
-/** @typedef {ReturnType<typeof content>} Content */
-/**
- * @param {unknown} response
- */
+/** @typedef {import('https://esm.sh/valibot@0.26.0').Output<typeof content_schema>} Content */
+/** @type {
+  (response: unknown)
+=>
+  Content
+}*/
 const content = (response) => parse(content_schema, response);
 
-/** @typedef {ReturnType<typeof atoms>} Atoms */
-/**
- * @param {unknown} response
- */
+/** @typedef {import('https://esm.sh/valibot@0.26.0').Output<typeof atoms_response_schema>} Atoms */
+/** @type {
+  (response: unknown)
+=>
+  Atoms
+}*/
 const atoms = (response) => parse(atoms_response_schema, response);
 
 const base = "https://content.guardianapis.com/";
