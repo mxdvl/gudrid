@@ -47,6 +47,9 @@ const result = object({
   tags: optional(array(tag), []),
   webUrl: transform(string([url()]), (input) => new URL(input)),
   elements: optional(array(element), []),
+  fields: optional(object({
+    commentable: optional(picklist(["true", "false"]))
+  })),
 });
 
 const search_schema = object({
