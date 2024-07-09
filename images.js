@@ -19,7 +19,7 @@ const resized = (master) => {
 };
 
 /** @type {
-  (elements: NonNullable<import("./capi.js").Search["response"]["results"][number]["elements"]>)
+  (elements: NonNullable<import("./capi.js").Search["results"][number]["elements"]>)
 =>
  string[]
 } */

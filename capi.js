@@ -6,10 +6,11 @@ import {
   optional,
   parse,
   picklist,
+  pipe,
   string,
   transform,
   url,
-} from "https://esm.sh/valibot@0.26.0";
+} from "https://esm.sh/valibot@0.36.0";
 
 const pillarId = optional(picklist([
   "pillar/news",
@@ -42,49 +43,61 @@ const result = object({
   pillarId,
   id: string(),
   type: string(), // ["tag", "article", "picture", "liveblog"]
-  webPublicationDate: transform(string(), (input) => new Date(input)),
+  webPublicationDate: pipe(string(), transform((input) => new Date(input))),
   webTitle: string(),
   tags: optional(array(tag), []),
-  webUrl: transform(string([url()]), (input) => new URL(input)),
+  webUrl: pipe(string(), url(), transform((input) => new URL(input))),
   elements: optional(array(element), []),
   fields: optional(object({
-    commentable: optional(picklist(["true", "false"]))
+    commentable: pipe(
+      optional(picklist(["true", "false"])),
+      transform((b) => b === "true" ? true : false),
+    ),
   })),
 });
 
-const search_schema = object({
-  response: object({
-    status: literal("ok"),
-    currentPage: number(),
-    pages: number(),
-    pageSize: number(),
-    total: number(),
-    results: array(result),
+const search_schema = pipe(
+  object({
+    response: object({
+      status: literal("ok"),
+      currentPage: number(),
+      pages: number(),
+      pageSize: number(),
+      total: number(),
+      results: array(result),
+    }),
   }),
-});
+  transform(({ response }) => response),
+);
 
-const content_schema = object({
-  response: object({
-    status: literal("ok"),
-    total: literal(1),
-    content: result,
+const content_schema = pipe(
+  object({
+    response: object({
+      status: literal("ok"),
+      total: literal(1),
+      content: result,
+    }),
   }),
-});
+  transform(({ response }) => response),
+);
 
-const atoms_response_schema = object({
-  response: object({
-    status: literal("ok"),
-    total: number(),
-    pages: number(),
-    currentPage: number(),
-    results: array(object({
-      "id": string(),
-      "atomType": string(),
-    })),
+const atoms_response_schema = pipe(
+  object({
+    response: object({
+      status: literal("ok"),
+      total: number(),
+      pages: number(),
+      currentPage: number(),
+      results: array(object({
+        id: string(),
+        atomType: string(),
+      })),
+    }),
   }),
-});
+  transform(({ response }) => response),
+);
 
-/** @typedef {import('https://esm.sh/valibot@0.26.0').Output<typeof search_schema>} Search */
+/** @typedef {import('https://esm.sh/valibot@0.36.0').InferOutput<typeof search_schema>} Search */
 /** @type {
   (response: unknown)
 =>
@@ -92,7 +105,7 @@ const atoms_response_schema = object({
 }*/
 const search = (response) => parse(search_schema, response);
 
-/** @typedef {import('https://esm.sh/valibot@0.26.0').Output<typeof content_schema>} Content */
+/** @typedef {import('https://esm.sh/valibot@0.36.0').InferOutput<typeof content_schema>} Content */
 /** @type {
   (response: unknown)
 =>
@@ -100,7 +113,7 @@ const search = (response) => parse(search_schema, response);
 }*/
 const content = (response) => parse(content_schema, response);
 
-/** @typedef {import('https://esm.sh/valibot@0.26.0').Output<typeof atoms_response_schema>} Atoms */
+/** @typedef {import('https://esm.sh/valibot@0.36.0').InferOutput<typeof atoms_response_schema>} Atoms */
 /** @type {
   (response: unknown)
 =>

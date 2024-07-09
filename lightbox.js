@@ -3,7 +3,7 @@ import { key } from "./key.js";
 import { get_images, resized, width } from "./images.js";
 import { base, content } from "./capi.js";
 import { default_content } from "./fallbacks.js";
-import { ValiError } from "https://esm.sh/valibot@0.26.0";
+import { ValiError } from "https://esm.sh/valibot@0.36.0";
 
 /** Setup **/
 const lightbox = document.querySelector("ul#lightbox");
@@ -24,7 +24,7 @@ const params = new URLSearchParams({
   "api-key": key,
 });
 const url = new URL(`${article}?${params.toString()}`, base);
-const { response } = await fetch(url, { "mode": "cors" })
+const response = await fetch(url, { "mode": "cors" })
   .then((response) => response.json())
   .then((json) => content(json))
   .catch((error) => {
@@ -133,7 +133,7 @@ async function* images({ tag, date, key, direction }) {
 }
 
 if (!tag) {
-  console.error(response.content);
+  console.error(content);
   const li = document.createElement("li");
   li.innerText = "Could not find a tag for this article";
   lightbox.append(li);

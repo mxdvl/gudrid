@@ -5,10 +5,11 @@ import {
   literal,
   object,
   parse,
+  pipe,
   string,
   transform,
   ValiError,
-} from "https://esm.sh/valibot@0.26.0";
+} from "https://esm.sh/valibot@0.36.0";
 import { atoms } from "./capi.js";
 
 // –– initial set up –– //
@@ -63,7 +64,7 @@ const get_atoms = async (page = 1, types = []) => {
   const url = new URL(`atoms?${params.toString()}`, base);
   3;
 
-  const { response: { currentPage, results, pages } } = await fetch(url, {
+  const { currentPage, results, pages } = await fetch(url, {
     "mode": "cors",
   })
     .then((response) => response.json())
@@ -73,13 +74,11 @@ const get_atoms = async (page = 1, types = []) => {
         console.error(error.issues);
       }
       return /** @satisfies {import('./capi.js').Atoms} */ ({
-        response: {
-          status: "ok",
-          currentPage: 1,
-          pages: 1,
-          total: 0,
-          results: [],
-        },
+        status: "ok",
+        currentPage: 1,
+        pages: 1,
+        total: 0,
+        results: [],
       });
     });
 
@@ -89,14 +88,14 @@ const get_atoms = async (page = 1, types = []) => {
   };
 };
 
-const usage_schema = transform(
+const usage_schema = pipe(
   object({
     response: object({
       status: literal("ok"),
       results: array(string()),
     }),
   }),
-  ({ response }) => response.results,
+  transform(({ response }) => response.results),
 );
 
 /** @type {
