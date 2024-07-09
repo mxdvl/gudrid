@@ -35,10 +35,10 @@ const fetch_content = async ({
 
   const url = new URL(`/search?${params.toString()}`, base);
 
-  const results = await fetch(url, { "mode": "cors" })
+  const { results } = await fetch(url, { "mode": "cors" })
     .then((response) => response.json())
-    .then((json) => search(json).results)
-    .catch(() => []);
+    .then((json) => search(json))
+    .catch(() => ({ results: [] }));
 
   /** @type {(result: typeof results[number])=> boolean} */
   const isBefore = ({ webPublicationDate }) => webPublicationDate < date;
