@@ -1,7 +1,12 @@
 {
   "name": "@mxdvl/gudrid",
-  "version": "0.0.2",
-  "exports": "./threads.js",
+  "version": "0.0.3",
+  "exports": {
+    "." : "./threads.js",
+    "./atoms": "./atoms.js",
+    "./capi": "./capi.js",
+    "./images": "./images.js"
+  },
   "tasks": {
     "dev": "./scripts/dev.sh",
     "format": "deno fmt",
