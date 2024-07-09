@@ -9,7 +9,7 @@ import {
   string,
   transform,
   ValiError,
-} from "https://esm.sh/valibot@0.36.0";
+} from "valibot";
 import { atoms } from "./capi.js";
 
 // –– initial set up –– //

@@ -1,5 +1,15 @@
 {
   "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@valibot/valibot@~0.36.0": "jsr:@valibot/valibot@0.36.0"
+    },
+    "jsr": {
+      "@valibot/valibot@0.36.0": {
+        "integrity": "36139cd850af78a876b9d9abf904a8d48c559374ce64e5a5b309dfea460a16ed"
+      }
+    }
+  },
   "redirects": {
     "https://esm.sh/valibot": "https://esm.sh/valibot@0.26.0"
   },
@@ -8,5 +18,10 @@
     "https://esm.sh/v135/valibot@0.36.0/denonext/valibot.mjs": "20e43e40f69dd683c2b827a9979c6c5419841b687f3fa9b5a73ffe278e208764",
     "https://esm.sh/valibot@0.26.0": "4db3b5d676f28112ccf99a741af5c9c62060d6cacec793d758843108fa8781ca",
     "https://esm.sh/valibot@0.36.0": "1e36f26c2e5fe91f33cf01b6f9d3a36a12e7527dd607fdfaa375e668df4142fa"
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@valibot/valibot@~0.36.0"
+    ]
   }
 }

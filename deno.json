@@ -1,4 +1,7 @@
 {
+  "name": "@mxdvl/gudrid",
+  "version": "0.0.1",
+  "exports": "./threads.js",
   "tasks": {
     "dev": "./scripts/dev.sh",
     "format": "deno fmt",
@@ -8,5 +11,8 @@
     "checkJs": true,
     "noUncheckedIndexedAccess": true,
     "lib": ["dom", "dom.iterable", "deno.ns"]
+  },
+  "imports": {
+    "valibot": "jsr:@valibot/valibot@~0.36.0"
   }
 }
