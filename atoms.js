@@ -128,11 +128,26 @@ async function* get_all_atoms(types = []) {
   }
 }
 
-const interactive_atoms = get_all_atoms(["interactive"]);
-const append = async (count = 10) => {
+const interactive_atoms = get_all_atoms(
+  [
+    // "interactive",
+    "media",
+    "audio",
+    "guide",
+    "quiz",
+    "qanda",
+    "profile",
+    "cta",
+  ],
+);
+const append = async (count = 120) => {
   const { done, value } = await interactive_atoms.next();
   if (done || !value) return;
   const { id, type, usage } = value;
+  if (usage.length === 0) {
+    await append(count);
+    return;
+  }
   ul.append(
     create_li({
       url: new URL(
