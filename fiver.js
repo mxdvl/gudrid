@@ -8,7 +8,7 @@ import {
   string,
   transform,
   ValiError,
-} from "https://esm.sh/valibot@0.26.0";
+} from "https://esm.sh/valibot@0.36.0";
 
 // –– initial set up –– //
 
@@ -54,7 +54,7 @@ const get_reviews = async (page = 1, stars = 5) => {
   const url = new URL(`search?${params.toString()}`, base);
   3;
 
-  const { response: { currentPage, results, pages } } = await fetch(url, {
+  const { currentPage, results, pages } = await fetch(url, {
     "mode": "cors",
   })
     .then((response) => response.json())
