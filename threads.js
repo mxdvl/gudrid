@@ -37,7 +37,7 @@ const fetch_content = async ({
 
   const results = await fetch(url, { "mode": "cors" })
     .then((response) => response.json())
-    .then((json) => search(json).response.results)
+    .then((json) => search(json).results)
     .catch(() => []);
 
   /** @type {(result: typeof results[number])=> boolean} */

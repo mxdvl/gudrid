@@ -1,4 +1,4 @@
-import { ValiError } from "https://esm.sh/valibot@0.26.0";
+import { ValiError } from "https://esm.sh/valibot@0.36.0";
 import { key } from "./key.js";
 import { base } from "./capi.js";
 import { search } from "./capi.js";
@@ -68,7 +68,7 @@ async function get_articles(page = 1) {
   const url = new URL(`search?${params.toString()}`, base);
   3;
 
-  const { response: { currentPage, results, pages } } = await fetch(url, {
+  const { currentPage, results, pages } = await fetch(url, {
     "mode": "cors",
   })
     .then((response) => response.json())
@@ -78,20 +78,18 @@ async function get_articles(page = 1) {
         console.error(error.issues);
       }
       return /** @satisfies {import('./capi.js').Atoms} */ ({
-        response: {
-          status: "ok",
-          currentPage: 1,
-          pages: 1,
-          total: 0,
-          results: [],
-        },
+        status: "ok",
+        currentPage: 1,
+        pages: 1,
+        total: 0,
+        results: [],
       });
     });
 
   return {
     results: results.map(({ id, fields }) => ({
       id,
-      commentable: fields?.commentable === "true",
+      commentable: !!fields?.commentable,
     })),
     next_page: currentPage < pages ? currentPage + 1 : undefined,
   };

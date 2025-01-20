@@ -1,17 +1,15 @@
 /** @satisfies {import("./capi.js").Content} */
 const default_content = {
-  response: {
-    status: "ok",
-    total: 1,
-    content: {
-      elements: [],
-      webPublicationDate: new Date(),
-      id: "",
-      type: "",
-      webTitle: "",
-      tags: [],
-      webUrl: new URL("https://www.theguardian.com"),
-    },
+  status: "ok",
+  total: 1,
+  content: {
+    elements: [],
+    webPublicationDate: new Date(),
+    id: "",
+    type: "",
+    webTitle: "",
+    tags: [],
+    webUrl: new URL("https://www.theguardian.com"),
   },
 };
 
