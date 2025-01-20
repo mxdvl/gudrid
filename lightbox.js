@@ -3,7 +3,7 @@ import { key } from "./key.js";
 import { get_images, resized, width } from "./images.js";
 import { base, content } from "./capi.js";
 import { default_content } from "./fallbacks.js";
-import { ValiError } from "https://esm.sh/valibot@0.36.0";
+import { ValiError } from "https://esm.sh/valibot@0.42.1";
 
 /** Setup **/
 const lightbox = document.querySelector("ul#lightbox");

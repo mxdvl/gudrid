@@ -8,7 +8,7 @@ import {
   string,
   transform,
   ValiError,
-} from "https://esm.sh/valibot@0.36.0";
+} from "https://esm.sh/valibot@0.42.1";
 
 // –– initial set up –– //
 

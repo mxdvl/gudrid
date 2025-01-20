@@ -10,7 +10,7 @@ import {
   string,
   transform,
   url,
-} from "https://esm.sh/valibot@0.36.0";
+} from "https://esm.sh/valibot@0.42.1";
 
 const pillarId = optional(picklist([
   "pillar/news",
@@ -97,7 +97,7 @@ const atoms_response_schema = pipe(
   transform(({ response }) => response),
 );
 
-/** @typedef {import('https://esm.sh/valibot@0.36.0').InferOutput<typeof search_schema>} Search */
+/** @typedef {import('https://esm.sh/valibot@0.42.1').InferOutput<typeof search_schema>} Search */
 /** @type {
   (response: unknown)
 =>
@@ -105,7 +105,7 @@ const atoms_response_schema = pipe(
 }*/
 const search = (response) => parse(search_schema, response);
 
-/** @typedef {import('https://esm.sh/valibot@0.36.0').InferOutput<typeof content_schema>} Content */
+/** @typedef {import('https://esm.sh/valibot@0.42.1').InferOutput<typeof content_schema>} Content */
 /** @type {
   (response: unknown)
 =>
@@ -113,7 +113,7 @@ const search = (response) => parse(search_schema, response);
 }*/
 const content = (response) => parse(content_schema, response);
 
-/** @typedef {import('https://esm.sh/valibot@0.36.0').InferOutput<typeof atoms_response_schema>} Atoms */
+/** @typedef {import('https://esm.sh/valibot@0.42.1').InferOutput<typeof atoms_response_schema>} Atoms */
 /** @type {
   (response: unknown)
 =>

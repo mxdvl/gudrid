@@ -1,5 +1,5 @@
 {
-  "version": "3",
+  "version": "4",
   "redirects": {
     "https://esm.sh/valibot": "https://esm.sh/valibot@0.26.0"
   },
@@ -7,6 +7,8 @@
     "https://esm.sh/v135/valibot@0.26.0/denonext/valibot.mjs": "dd0970766fe277c2c7b5d247085c9f4adca1ddf34de83e5c261fd380d784d241",
     "https://esm.sh/v135/valibot@0.36.0/denonext/valibot.mjs": "20e43e40f69dd683c2b827a9979c6c5419841b687f3fa9b5a73ffe278e208764",
     "https://esm.sh/valibot@0.26.0": "4db3b5d676f28112ccf99a741af5c9c62060d6cacec793d758843108fa8781ca",
-    "https://esm.sh/valibot@0.36.0": "1e36f26c2e5fe91f33cf01b6f9d3a36a12e7527dd607fdfaa375e668df4142fa"
+    "https://esm.sh/valibot@0.36.0": "1e36f26c2e5fe91f33cf01b6f9d3a36a12e7527dd607fdfaa375e668df4142fa",
+    "https://esm.sh/valibot@0.42.1": "aa98c5750d19a71fe746ba5b1b617d88a7f721ebdde49f07e81c4f6b3db707a4",
+    "https://esm.sh/valibot@0.42.1/denonext/valibot.mjs": "ea7d21d9ea4e1e2838572ffdcf36c3af4311356b2a19b3a849d66cae6518099b"
   }
 }

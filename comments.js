@@ -1,4 +1,4 @@
-import { ValiError } from "https://esm.sh/valibot@0.36.0";
+import { ValiError } from "https://esm.sh/valibot@0.42.1";
 import { key } from "./key.js";
 import { base } from "./capi.js";
 import { search } from "./capi.js";
